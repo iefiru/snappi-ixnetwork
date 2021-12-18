@@ -306,6 +306,7 @@ class TrafficItem(CustomField):
         "vni": "vxlan.header.vni",
         "reserved1": "vxlan.header.reserved8",
         "order": ["flags", "reserved0", "vni", "reserved1"],
+        "convert_int_to_hex": ["flags"],
     }
 
     def __init__(self, ixnetworkapi):
