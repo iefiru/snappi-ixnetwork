@@ -287,6 +287,11 @@ class Vport(object):
         with Timer(self._api, "Location connect [%s]" % ", ".join(locations)):
             self._import(imports)
         with Timer(
+            self._api,
+            "Reboot CPU and factory default [%s]" % ", ".join(locations)
+        ):
+            self._api._vport.find().ResetPortCpuAndFactoryDefault()
+        with Timer(
             self._api, "Location state check [%s]" % ", ".join(locations)
         ):
             self._api._vport.find(ConnectionState="^(?!connectedLink).*$")
