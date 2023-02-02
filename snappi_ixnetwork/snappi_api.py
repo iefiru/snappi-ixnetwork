@@ -580,6 +580,12 @@ class Api(snappi.Api):
             self._traffic = self._ixnetwork.Traffic
             self._traffic_item = self._ixnetwork.Traffic.TrafficItem
             self._globals = self._ixnetwork.Globals
+            # reduce statistics polling interval
+            self._globals.Statistics.Advanced.PollingSettings.update(
+                ForcePollValue=True,
+                PollInterval=1, # the default is 1 times 2 seconds
+                MinimumRefreshIntervalForOnDemandViews=1,
+            )
             if not self._ixn_version_check():
                 raise Exception(
                     "IxNetwork 9.10 or newer is required for snappi[ixnetwork]"
