@@ -196,19 +196,26 @@ class Vport(object):
 
     def _add_hosts(self, HostReadyTimeout):
         chassis = self._api._ixnetwork.AvailableHardware.Chassis
-        add_addresses = []
-        check_addresses = []
+        hosts = set()
         for port in self._api.snappi_config.ports:
             location = port.get("location")
             if location is not None:
                 location_info = self._api.parse_location_info(location)
                 chassis_address = location_info.chassis_info
+                hosts.add(chassis_address)
+
+        add_addresses = []
+        check_addresses = []
+        with Timer(
+            self._api, "Find location hosts [%s]" % ", ".join(hosts)
+        ):
+            for chassis_address in hosts:
                 chassis.find(Hostname="^%s$" % chassis_address)
                 if len(chassis) == 0:
                     add_addresses.append(chassis_address)
-                check_addresses.append(chassis_address)
-        add_addresses = set(add_addresses)
-        check_addresses = set(check_addresses)
+                if len(chassis) == 0 or chassis.State != "ready":
+                    check_addresses.append(chassis_address)
+
         if len(add_addresses) > 0:
             with Timer(
                 self._api, "Add location hosts [%s]" % ", ".join(add_addresses)
