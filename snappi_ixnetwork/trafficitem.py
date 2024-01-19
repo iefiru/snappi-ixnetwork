@@ -58,7 +58,8 @@ class TrafficItem(CustomField):
         "gTPuOptionalFields": "gtpv1option",
         "custom": "custom",
         "vxlan": "vxlan",
-        "ethernetARP": "arp"
+        "ethernetARP": "arp",
+        "mpls": "mpls",
     }
 
     _HEADER_TO_TYPE = {
@@ -74,7 +75,8 @@ class TrafficItem(CustomField):
         "gtpv1option": "gTPuOptionalFields",
         "custom": "custom",
         "vxlan": "vxlan",
-        "arp": "ethernetARP"
+        "arp": "ethernetARP",
+        "mpls": "mpls",
     }
 
     _BIT_RATE_UNITS_TYPE = {
@@ -348,6 +350,14 @@ class TrafficItem(CustomField):
         "reserved1": "vxlan.header.reserved8",
         "order": ["flags", "reserved0", "vni", "reserved1"],
         "convert_int_to_hex": ["flags"],
+    }
+
+    _MPLS = {
+        "label": "mpls.label.value",
+        "traffic_class": "mpls.label.experimental",
+        "bottom_of_stack": "mpls.label.bottomOfStack",
+        "time_to_live": "mpls.label.ttl",
+        "order": ["label", "traffic_class", "bottom_of_stack", "time_to_live"],
     }
 
     def __init__(self, ixnetworkapi):
