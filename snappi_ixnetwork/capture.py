@@ -330,16 +330,6 @@ class Capture(object):
             + self._api._vport.Name
             + "_SW.cap"
         )
-        merged_capture = (
-            self._api._ixnetwork.Globals.PersistencePath
-            + "/capture/"
-            + self._api._vport.Name
-            + ".cap"
-        )
-
-        self._api._ixnetwork.MergeCapture(
-            Arg1=cc, Arg2=dc, Arg3=merged_capture
-        )
 
         url = "{}/vport/operations/releaseCapturePorts".format(
             self._api._ixnetwork.href
@@ -347,15 +337,28 @@ class Capture(object):
         payload = {"arg1": [self._api._vport.href]}
         self._api._request("POST", url, payload)
 
+        # WORKAROUND:
+        #
+        # seems the `MergeCapture` api will lock the merged file, (
+        # System.IO.IOException: The process cannot access the file
+        # 'C:\path\to\packet.cap' because it is being used by another process.)
+        #
+        # ref: https://github.com/open-traffic-generator/snappi-ixnetwork/issues/522
         path = "%s/capture" % self._api._ixnetwork.Globals.PersistencePath
-        #Todo: Revert dc to merged capture after fix is available in 9.20
-        url = "%s/files?absolute=%s&filename=%s" % (
+        dc_url = "%s/files?absolute=%s&filename=%s" % (
             self._api._ixnetwork.href,
             path,
             dc,
         )
-        pcap_file_bytes = self._api._request("GET", url)
-        return io.BytesIO(pcap_file_bytes)
+        dc_bytes = self._api._request("GET", dc_url)
+
+        cc_url = "%s/files?absolute=%s&filename=%s" % (
+            self._api._ixnetwork.href,
+            path,
+            cc,
+        )
+        cc_bytes = self._api._request("GET", cc_url)
+        return io.BytesIO(dc_bytes + cc_bytes)
 
 
 class GetPattern(object):
