@@ -6,7 +6,7 @@ import snappi
 from snappi_ixnetwork.validation import Validation
 from snappi_ixnetwork.vport import Vport
 from snappi_ixnetwork.lag import Lag
-from snappi_ixnetwork.ngpf import Ngpf
+from snappi_ixnetwork.device.ngpf import Ngpf
 from snappi_ixnetwork.trafficitem import TrafficItem
 from snappi_ixnetwork.capture import Capture
 from snappi_ixnetwork.ping import Ping
@@ -496,6 +496,9 @@ class Api(snappi.Api):
             self._errors.append("%s %s" % (type(error), str(error)))
         else:
             self._errors.append(error)
+
+    def get_errors(self):
+        return self._errors
 
     def parse_location_info(self, location):
         """It will return (chassis,card,port)
